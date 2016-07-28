@@ -1,0 +1,343 @@
+
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{dirtree}
+\usepackage{fancyvrb}
+\usepackage{float}
+\usepackage{setspace}
+
+\linespread{1.3}
+
+\newenvironment{vcode}{\small \singlespacing  \normalsize}
+
+\title{GEM3D Standard Coding Style Guide}
+
+\author{
+	Anup Shrestha\\ \texttt{anupshrestha@u.boisestate.edu} \and
+	Dr. Inanc Senocak\\ \texttt{senocak@boisestate.edu}
+}
+
+\begin{document}
+\maketitle
+
+This document discusses recommended practices, coding styles and conventions for writing and organizing a C program. ``Good programming style begins with the effective organization of code. By using a clear and consistent organization of the components of your programs, you make them more efficient, readable, and maintainable." - Steve Oualline, C Elements of Style. Coding style and consistency matters for writing efficient code and increasing productivity. A code that is easy to read is also easy to understand, allowing programmers to focus on substance rather than spending time figuring out what the code does. Therefore, a code with ``good style" is defined as that which is 
+
+\begin{itemize}
+	\item Organized
+	\item Easy to read and understand
+	\item Efficient
+	\item Maintainable and Extensible
+\end{itemize}
+
+The guidelines presented here are based on recommended software engineering techniques, industry standards, recommended practices from the experts in the field and local conventions. Various parts of the guidelines have been extracted from the NASA C Style Guide \cite{nasa_style1994}, The C Programming Language \cite{c_style} and the Linux Kernel Coding Style \cite{linux_style}.  
+
+\section{Program Organization}
+A C program consists of multiple routines that are grouped together into different files based on their functionality called module or source files. The prototype of the functions of each module file that are shared between different modules are put in a separate file called a header file. Furthermore, usually with large programs there is also a build file (e.g. Makefile) that automates the process of compiling and linking all the files of the program. During compilation, the compiler generates object files for each source file that gets linked together to generate the final executable. Hence, it is easy to see that the number of files in a C program could increase significantly therefore, a proper organization schema is a must to maintain consistency and good style. A recommended schema for organizing a C program is shown in Fig. \ref{fig:org_schema}.
+
+\begin{figure}[H]
+	\centering
+	\framebox[\textwidth]{%
+		\begin{minipage}{0.9\textwidth}
+			%\renewcommand*\DTstylecomment{\rmfamily\color{green}\textsc}
+			%\renewcommand*\DTstyle{\ttfamily\textcolor{red}}
+			\setlength{\DTbaselineskip}{20pt}
+			\DTsetlength{1em}{3em}{0.1em}{1pt}{4pt}
+			\dirtree{%
+				.1 \vdots.
+				.1 program.
+				.2 README.
+				.2 bin.
+				.3 executable.
+				.2 obj.
+				.3 *.o\DTcomment{object files}.
+				.2 src.
+				.3 *.h\DTcomment{header files}.
+				.3 *.c\DTcomment{source files}.
+				.2 build file\DTcomment{Makefile}.
+				.1 \vdots.
+			}
+		\end{minipage}
+	}
+	\caption{Program Organization Schema}
+	\label{fig:org_schema}
+\end{figure}
+
+The following sections discusses the different files in a C program and recommends a good coding style to follow.
+
+\subsection{README File}
+A README file should be named ``README" and succinctly explain what the program does and how the different files are organized. It should contain all the important information about the program as following
+
+\begin{itemize}
+	\item Program name followed by a brief description
+	\item Version, Contact, and License information
+	\item Program Organization
+	\item Requirements and Dependencies
+	\item Instructions for compiling and installing the program
+	\item Usage information for running the program
+\end{itemize}
+
+An example template of a README file is shown in Fig. \ref{fig:readme_template}.
+
+\input{readme}
+
+\subsection{Header Files}
+A program with good style uses module files to group logically related functions into one file. Header files make it possible to share information between modules that need access to external variables or functions. It also encapsulates the implementation details in the module files. Follow the following guidelines when writing a header file.
+
+\begin{itemize}
+	\item Save the header file with a ``.h" extension and use an all lowercase filename that best describes the relation of its content. Avoid names that could conflict with system header files.
+	\item Start header files with an include guard. It prevents the compiler from processing the same header file more than once.
+	\item Use the header filename in all uppercase and append ``\_H" to define the header.
+	\item Use specialized (e.g., doxygen) comments in order to generate documentation automatically.
+	\item Follow the header file template in Fig. \ref{fig:header_template} for the prologue.
+	\item Only include other header files if they are needed by the current header file. Do not rely on users including things.
+	\item Group the header file includes logically from local to global and arrange them in an alphabetical order for each group.
+	\item Do not use absolute path in \#include directive.
+	\item Use \#include \textless system\_file\textgreater for system include files.
+	\item Use \#include ``user\_file" for user include files.
+	\item Put data definitions, declarations, typedefs and enums used by more than one program in a header file.
+	\item Only include those function prototypes that need to be visible to the linker.
+	\item End the header file with the following comment on the same line as the end of the include guard.
+	
+	\begin{Verbatim}
+	#endif /* END <FILENAME>_H */
+	\end{Verbatim}
+	
+\end{itemize}
+
+An example template of a C header file is shown in Fig. \ref{fig:header_template}.
+\input{header}
+
+\subsection{Source Files}
+A source file contains the implementation of logically related functions, constants, types, data definitions and declarations \cite{nasa_style1994}. Follow the following guidelines when writing a source file.
+
+\begin{itemize}
+	\item Save the source file with a ``.c" extension and use an all lowercase filename that best describes the relation of its content or the same as the header file whose functions it is implementing. If the source file contains the main function then name it ``\texttt{main.c}".
+	\item Start with the file prologue. Follow the source file template in Fig. \ref{fig:header_template} for the prologue.
+	\item Then, include header files that are necessary.
+	\item Group the header file includes logically from local to global and arrange them in an alphabetical order for each group.
+	\item Do not use absolute path in \#include directive.
+	\item Use \#include \textless system\_file\textgreater for system include files.
+	\item Use \#include ``user\_file" for user include files.
+	\item Use specialized (e.g., doxygen) comments in order to generate documentation automatically.
+	\item Make the local functions static and follow the guidelines listed in Section \ref{sec:functions}.
+	\item Format the file as described in Section \ref{sec:code_style}.
+\end{itemize}
+
+An example template of a C source file is shown in Fig. \ref{fig:source_template}.
+\input{source}
+
+\section{Recommended C Coding Style and Conventions}
+\label{sec:code_style}
+
+\subsection{Naming}
+Names for files, functions, constants or variables should be descriptive, meaningful and readable. However, over complicating a variable name is also not recommended. For example, a variable that holds a temporary value can always be named `tmp' instead of 'temporaryCounterVariable' \cite{linux_style}. As a general rule, the scope of a variable is directly proportional to the length of its name. For example, an important variable that is used in most places should have a very descriptive name. Conversely, local variable names should be short, and to the point. A random integer loop counter, should probably be called ``i", since this is very common and there is no chance of it being mis-understood \cite{linux_style}. Furthermore, the names of functions, constants and typedefs should be self descriptive, as short as possible and unambiguous. Finally, the names should always be written in a consistent manner as shown in Table \ref{tbl:naming_convention}. Here, for consistency the  recommended naming convention to use is \emph{lowerCamelCase} unless specified explicitly.
+
+\begin{table}[h]
+	\caption{Recommended Naming Convention}
+	\label{tbl:naming_convention}
+	\begin{tabular}{|l|l|}\hline
+		Name             &Convention\\ \hline
+		file name        &should start with letter and be a noun\\ \hline
+		function name    &should start with letter and be a verb\\ \hline
+		variable name    &should start with letter\\ \hline
+		constant name    &should be in uppercase words separated by underscores\\ \hline
+		type name        &should start with letter and be a noun\\ \hline
+		enumeration name &should be in uppercase words separated by underscores\\ \hline
+		global name      &prefix using \texttt{g\_}\\ \hline
+	\end{tabular}
+\end{table}
+
+\subsection{Indentation}
+Indentation defines an area where a block of control starts and ends. Proper indentation makes the code easier to read. Always use \textbf{tabs} to indent code rather than spaces. The rationale being spaces can often be out by one, and lead to misunderstandings about which lines are controlled by if-statements or loops. An incorrect number of tabs at the start of line is easier to spot \cite{c_style}. Tabs are usually 8 characters however, for scientific code where use of multiple nested for-loops is the norm, having a large indentation is not recommended. Use \textbf{4} characters deep indent which will still make the code easy to read and not flushed too far to the right.
+
+\subsection{Braces}
+The placement of the braces is a style choice and different styles have their own benefits. However, for consistency and the benefit of minimizing the number of lines without any loss of readability follow the ``K\&R" style for brace placement \cite{c_style}. Their preferred way is to put the opening brace last on the line, and put the closing brace first.
+
+\begin{Verbatim}
+if (true) {
+	do sth ...
+}
+\end{Verbatim}
+This applies to all non-function statement blocks \texttt{(if, switch, for, while, do)}. However, there is one special case, namely functions: they have the opening brace at the beginning of the next line, thus:
+
+\begin{Verbatim}
+int function(int x)
+{
+	...
+}
+\end{Verbatim}
+
+Note that the closing brace is empty on a line of its own, except in the cases where it is followed by a continuation of the statement, i.e., a while in a do-statement or an else in an if-statement, like this:
+\\\\
+\begin{minipage}[t]{0.5\textwidth}
+\begin{Verbatim}
+do {
+	...
+} while (condition);
+\end{Verbatim}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{Verbatim}
+if (x == y) {
+	...
+} else if (x > y) {
+	...
+} else {
+	...
+}
+\end{Verbatim}
+\end{minipage}
+\\\\
+Do not unnecessarily use braces where a single statement will do.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{Verbatim}
+if (condition)
+	action();
+\end{Verbatim}
+\end{minipage}
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{Verbatim}
+if (condition)
+	doThis();
+else
+	doThat();	
+\end{Verbatim}
+\end{minipage}
+\\\\
+This does not apply if only one branch of a conditional statement is a single statement; in the latter case use braces in both branches:
+
+\begin{Verbatim}
+if (condition) {
+	doThis();
+	doThat();
+} else {
+	otherwise();
+}	
+\end{Verbatim}
+
+\subsection{Spaces}
+Spaces should be used to separate components of expressions, to reveal structure and make clear intention. Good spacing reveals and documents programmer's intentions whereas poor spacing can lead to confusion. \cite{c_style} 
+\begin{itemize}
+	\item Use a space after keywords like:\\
+	\texttt{if, switch, case, for, do, while}.
+	\item Use one space on each side of binary and ternary operators like:\\
+	\texttt{\detokenize{=  +  -  <  >  *  /  |  &  ^  <=  >=  ==  !=  ?  :} \%}
+	\item Use a space (or newline) after commas \texttt{,} and semicolons \texttt{;}.
+	\item Do not use space after unary operators like:\\
+	\texttt{\detokenize{&  *  +  -  ~  !  sizeof  typeof  alignof  __attribute__  defined}}
+	\item Do not use space around the primary operators like:\\
+	\texttt{\detokenize{->, ., and []}}.
+	\item Do not use space before the prefix and after the postfix increment and decrement unary operators like:\\
+	\texttt{\detokenize{++ --}}
+	\item Do not leave trailing whitespace at the ends of lines.
+\end{itemize}
+
+\subsection{Commenting}
+Comments when used properly can provide important information that cannot be discerned by just reading the code. However, if used improperly it can make code difficult to understand. When writing comments do not try to explain how the code works, let the code speak for itself. In general comments should explain what the code does and possibly why it does it. The preferred style for multi-line comments is specialized, doxygen style comment block, so that documentation can be generated automatically.
+
+\begin{Verbatim}
+/**
+ * \brief Brief description.
+ *        Brief description continued.
+ * 
+ * This is the preferred style for multi-line
+ * comments using the doxygen style comment block.
+ * Two column of asterisks on the left side of the
+ * first line. Then, a single column of asterisks
+ * on the left side, ending with almost-blank line.
+ *
+ * \author Name
+ * @see functions()
+ */
+\end{Verbatim}
+
+Also, add comments to data throughout the file, where they are being declared or defined. Use one data declaration per line (i.e., no commas for multiple data declarations), leaving space for small comment on each item, explaining its purpose. If more than one short comment appears in a block of code or data definition, start all of them at the same tab position and end all at the same position.
+
+\begin{Verbatim}
+void someFunction()
+{
+	doWork();     /* Does something */
+	doMoreWork(); /* Does something else} */
+}
+\end{Verbatim}
+
+\subsection{Functions} \label{sec:functions}
+Design functions to be short that does just one thing and does that well. Each function should be preceded by a function prologue that gives a short description of what the function does and how to use it. Avoid duplicating information clear form the code. An example function prologue is shown in Fig \ref{fig:function_template}. The recommended conventions for declaring a function
+
+\begin{itemize}
+	\item The function's return type, name and arguments should be on the same line, unless the number of arguments do not fit on a single line. In that case move the rest of the arguments to the next line aligned with the arguments on the line above.
+	\item The name of the function should be descriptive and follow the naming conventions defined in Table \ref{tbl:naming_convention}.
+	\item Do not default to int; if the function does not return a value then it should be given return type void.
+	\item The opening brace of the function body should be alone on a line beginning in column 1.
+	\item Declare each parameter, do  not default to int.
+	\item Comments for parameters and local variables should be tabbed so that they line up underneath each other.
+	\item In function prototypes, include parameter names with their data types.
+\end{itemize}
+
+\input{function}
+
+\subsection{Structs, Macros and Enums}
+\begin{itemize}
+	\item Structs\\
+	Structures are very useful feature in C, that enhances the logical organization of the code and offers consistent addressing \cite{nasa_style1994}. The variables declared in a struct should be ordered by type to minimize any memory wastage because of compiler alignment issues, then by size and then by alphabetical order.
+	
+\begin{Verbatim}
+struct point3D {
+	int x;
+	int y;
+	int z;
+}	
+\end{Verbatim}
+	
+	\item Macros\\
+	Using the \#define preprocessor command to define constants is a convenient technique. It not only improves readability, but also provides a mechanism to avoid hard-coding numbers. Use uppercase letters to name constants and align the various components as shown in the example below.
+
+\begin{Verbatim}
+#define NULL  0
+#define FALSE 0
+#define TRUE  1
+\end{Verbatim}
+	
+	On the other hand avoid using macro functions. They are generally a bad idea with potential side-effects without any advantages.
+	
+	\item Enums\\
+	Enumeration types are used to create an association between constant names and their values. Use uppercase letters to name the enum type and the constants. Place one variable identifier per line and use aligned braces and indentation to improved readability.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{Verbatim}
+enum POSITION {
+	LOW,
+	MIDDLE,
+	HIGH
+};
+\end{Verbatim}
+\end{minipage}%
+\begin{minipage}[t]{0.5\textwidth}
+\begin{Verbatim}
+enum POSITION {
+	LOW    = -1,
+	MIDDLE = 0,
+	HIGH   = 1
+};	
+\end{Verbatim}
+\end{minipage}
+
+\end{itemize}
+
+\bibliographystyle{plain}
+\begin{thebibliography}{99} 
+	\label{references}
+	
+	\bibitem{nasa_style1994} Doland, Jerry and Valett, Jon, {\em C Style Guide.} Software Engineering Laboratory Series, 1994. \texttt{http://homepages.inf.ed.ac.uk/dts/pm/Papers/nasa-c-style.pdf}
+	
+	\bibitem{linux_style} Torvalds, Linus, {\em Linux kernel coding style.} Linux Kernel Archives. \texttt{https://www.kernel.org/doc/Documentation/CodingStyle}
+	
+	\bibitem{c_style} Kernighan, Brian W. and Ritchie, Dennis M., {\em The C Programming Language.} Prentice Hall Inc, 1988. \texttt{https://www.kernel.org/doc/Documentation/CodingStyle}
+	
+\end{thebibliography}
+\end{document}
+
+}

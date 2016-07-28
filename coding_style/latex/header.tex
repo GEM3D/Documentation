@@ -1,0 +1,50 @@
+\begin{figure}[htp]
+	
+\begin{vcode}
+\begin{Verbatim}[frame=single,framesep=2mm,commandchars=\\\{\}]
+				
+#ifndef FILENAME_H
+#define FILENAME_H
+
+/**
+ * @file <filename>.h
+ * @brief Brief explanation of the header file.
+ * 
+ * Here typically goes a more extensive explanation of what the header
+ * defines.
+ * 
+ * @author Last Name, First Name Middle Initial
+ * @date DD MON YYYY
+ * @see http://website/
+ * 
+ * @note Something to note.
+ * @warning Warning.
+ * @bug No known bugs.
+ * 
+ */
+
+#include "local1.h"
+#include "local2.h"
+
+#include "external.h"
+
+#include <system.h>
+
+/**
+ * @brief Brief explanation
+ * 
+ * @param[in]     arg1 explain the argument
+ * @param[in,out] arg2 explain the argument
+ * @return void
+ * 
+ */
+void functionPrototype(int arg1, char *arg2);
+
+#endif /* END FILENAME_H */
+
+\end{Verbatim}
+\end{vcode}
+
+\caption{C header file template}
+\label{fig:header_template}
+\end{figure}
